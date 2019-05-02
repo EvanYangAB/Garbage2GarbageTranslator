@@ -12,7 +12,7 @@ import torch
 import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
-    
+MAX_LENGTH = 40
 
 class SentenceDatabase:
     def addWord(self, word):
@@ -48,7 +48,7 @@ class SentenceDatabase:
         self.data = {}
         for question in self.raw_questions:
             q_data = {key: question[key] for key in ["category", "subcategory", "text", "answer", "qanta_id"]}
-            q_data["sentences"] = sent_tokenize(q_data["text"])
+            q_data["sentences"] = sent_tokenize(q_data["text"].replace(u'\xa0', u' '))
             q_id = q_data["qanta_id"]
             self.data[q_id] = q_data
         self.evidences = self.evidences["evidence"]
@@ -67,16 +67,16 @@ class SentenceDatabase:
                 self.sentence_pair.append([d["answer"].split(" [")[0], pos_tag(word_tokenize(q_sent)), [pos_tag(word_tokenize(sent_evi["sent_text"])) for sent_evi in q_sent_evis]])
             if size >= size_limit:
                 break
-        for answer, q_sent, evi_sentences in self.sentence_pair:
-            for word in word_tokenize(answer):
-                self.addWord(word)
-            for word, tag in word_tokenize(q_sent):
-                self.addWord(word)
-                self.addTag(tag)
-            for sent in evi_sentences:
-                for word, tag in word_tokenize(sent):
-                    self.addWord(word)
-                    self.addTag(tag)
+        # for answer, q_sent, evi_sentences in self.sentence_pair:
+        #     for word in word_tokenize(answer):
+        #         self.addWord(word)
+        #     for word, tag in word_tokenize(q_sent):
+        #         self.addWord(word)
+        #         self.addTag(tag)
+        #     for sent in evi_sentences:
+        #         for word, tag in word_tokenize(sent):
+        #             self.addWord(word)
+        #             self.addTag(tag)
  
 class EncoderRNN(nn.Module):
     def __init__(self, input_size, hidden_size):
@@ -138,4 +138,4 @@ class AttnDecoderRNN(nn.Module):
 
 
 s = SentenceDatabase("dev")
-print(s.sentence_pair[3])
+print(s.raw_questions[0])
