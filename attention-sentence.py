@@ -134,7 +134,9 @@ class EncoderRNN(nn.Module):
     def initHidden(self):
         return torch.zeros(1, 1, self.hidden_size, device=device)
 
-# outputs is of length max_length*sent_ratio, hiddens is a sent_ratio length array with each tensor is hidden_size long  
+# outputs is of length max_length*sent_ratio, 
+# hiddens is a sent_ratio length array with each tensor is hidden_size long, it is currently not used
+# in this build
 class AttnDecoderRNN(nn.Module):
     def __init__(self, hidden_size, output_size, dropout_p=0.1, max_length=MAX_LENGTH):
         super(AttnDecoderRNN, self).__init__()
@@ -144,13 +146,13 @@ class AttnDecoderRNN(nn.Module):
         self.max_length = max_length
 
         self.embedding = nn.Embedding(self.output_size, self.hidden_size)
-        self.attn = nn.Linear(self.hidden_size * 2, self.max_length)
-        self.attn_combine = nn.Linear(self.hidden_size * 2, self.hidden_size)
+        self.attn = nn.Linear(self.hidden_size * 2, self.max_length * SENT_RATIO)
+        self.attn_combine = nn.Linear(self.hidden_size + self.max_length * SENT_RATIO, self.hidden_size)
         self.dropout = nn.Dropout(self.dropout_p)
         self.gru = nn.GRU(self.hidden_size, self.hidden_size)
         self.out = nn.Linear(self.hidden_size, self.output_size)
 
-    def forward(self, input, hidden, encoder_outputs, encoder_hiddens):
+    def forward(self, input, hidden, encoder_outputs):
         embedded = self.embedding(input).view(1, 1, -1)
         embedded = self.dropout(embedded)
 
