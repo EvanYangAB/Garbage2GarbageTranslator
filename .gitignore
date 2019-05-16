@@ -1,4 +1,6 @@
 *.json
 *.txt
 *.zip
-\
+attn_model_*
+encoder_model_*
+pickle_data
