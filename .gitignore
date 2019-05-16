@@ -1,5 +1,4 @@
 *.json
-*.txt
 *.zip
 attn_model_*
 encoder_model_*
