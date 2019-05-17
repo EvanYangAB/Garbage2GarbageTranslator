@@ -100,7 +100,7 @@ class SentenceDatabase:
             # removing for 10 points
             if (sent[0] == ('For', 'IN')) and (sent[1] == ('10', 'CD')) and (sent[2] == ('points', 'NNS')):
                 continue
-            switch = len(sent) < MAX_LENGTH
+            switch = (len(sent) < MAX_LENGTH) and (len(sent) > 6)
             switch = switch and (len(evids) == SENT_RATIO)
             for e in evids:
                 switch = switch and (len(e) < MAX_LENGTH)
@@ -351,7 +351,7 @@ def showPlot(points):
 
 if not Load_data:
     file = open('pickle_data', 'wb')
-    s = SentenceDatabase('dev')
+    s = SentenceDatabase('train')
     pickle.dump(s, file)
     file.close()
 else:
@@ -369,10 +369,10 @@ else:
     hidden_size = HIDDEN_SIZE
     encoder = EncoderRNN(s.n_words, hidden_size).to(device)
     attn_decoder = AttnDecoderRNN(hidden_size, s.n_words, dropout_p=0.1).to(device)
-trainIters(s, encoder, attn_decoder, 7500, print_every=50)
+trainIters(s, encoder, attn_decoder, 75000, print_every=500)
 # if input("save?") is 'y':
 #     torch.save(encoder, "encoder_model")
 #     torch.save(attn_decoder, "attn_model")
-torch.save(encoder, "encoder_model_2")
-torch.save(attn_decoder, "attn_model_2")
+torch.save(encoder, "encoder_model_3")
+torch.save(attn_decoder, "attn_model_4")
 evaluateRandomly(s, encoder, attn_decoder)
